@@ -163,13 +163,13 @@ function step() {
   if (e.run) e.run();
   if (!e.t) { step(); return; }
   speaker(e.c, e.e);
-  type(e.t, () => { if (e.ch) showChoices(e.ch); else { ready = true; $("#next").style.visibility = "visible"; } });
+  type(e.t, () => { if (e.ch) showChoices(e.ch, e.c); else { ready = true; $("#next").style.visibility = "visible"; } });
 }
 function advance() {
   if (typing) { endType(); return; }
   if (ready) step();
 }
-function showChoices(list) {
+function showChoices(list, c) {
   const box = $("#choices"); box.innerHTML = ""; $("#next").style.visibility = "hidden";
   list.forEach(o => {
     const b = el("button", "", o.t);
@@ -178,8 +178,8 @@ function showChoices(list) {
       else if (o.ok) {
         b.className = "good"; b.innerHTML = "✓ CORRECT — " + o.t;
         box.querySelectorAll("button").forEach(x => x.disabled = true);
-        say(1, "excited", o.fb); ready = true; $("#next").style.visibility = "visible";
-      } else { b.className = "bad"; b.innerHTML = "✕ TRY AGAIN — " + o.t; b.disabled = true; say(1, "worried", o.fb); }
+        say(c, "happy", o.fb); ready = true; $("#next").style.visibility = "visible";
+      } else { b.className = "bad"; b.innerHTML = "✕ TRY AGAIN — " + o.t; b.disabled = true; say(c, "thinking", o.fb); }
     };
     box.append(b);
   });
@@ -187,83 +187,74 @@ function showChoices(list) {
 const WRONG = "Not quite. Remember to use the corresponding positions.";
 
 /* ===== 6. DIALOGUE DATA ===== */
+// PRESENTATION SCRIPT: each character presents only their own topic, speaking to the audience.
+//   Intro: Character 1 · Addition: Character 2 · Subtraction: Character 3
+//   Multiplication: Characters 1 and 4 · Review: Character 4
 const INTRO = [
-  { c: 1, e: "happy", t: "So... we're supposed to report about matrices today?", run: () => { board.className = ""; board.innerHTML = '<div class="final"><h1>MATRICES</h1></div>'; } },
-  { c: 3, e: "thinking", t: "Yeah. But aren't matrices just boxes filled with numbers?" },
-  { c: 2, e: "neutral", t: "Not exactly." },
-  { c: 2, e: "neutral", t: "A matrix is a rectangular arrangement of numbers organized into rows and columns.", run: basicsBoard },
-  { c: 2, e: "thinking", t: "This is a 3×3 matrix because it has 3 rows and 3 columns.", run: () => { highlightRow(cur.m, 0); highlightColumn(cur.m, 2); } },
-  { c: 4, e: "neutral", t: "Rows go horizontally. Columns go vertically. (Try the buttons under the matrix.)" },
-  { c: 3, e: "happy", t: "Okay, that makes sense! What should we do next?", ch: [
+  { c: 1, e: "happy", t: "Good day, everyone! Our report today is about MATRICES. We will cover addition, subtraction and multiplication.", run: () => { board.className = ""; board.innerHTML = '<div class="final"><h1>MATRICES</h1></div>'; } },
+  { c: 1, e: "neutral", t: "A matrix is a rectangular arrangement of numbers organized into rows and columns.", run: basicsBoard },
+  { c: 1, e: "thinking", t: "This is a 3×3 matrix because it has 3 rows and 3 columns.", run: () => { highlightRow(cur.m, 0); highlightColumn(cur.m, 2); } },
+  { c: 1, e: "neutral", t: "Rows go horizontally. Columns go vertically. What would you like to see next?", ch: [
     { t: "1. Continue", go: [] },
     { t: "2. Explain rows and columns", go: [
-      { c: 2, e: "neutral", t: "Every number has an address: row first, then column. A[2,3] is row 2, column 3 — the number 6.", run: () => { clearHL(cur.m); highlightCell(cur.m, 1, 2); } },
-      { c: 4, e: "neutral", t: "Row first. Column second. Always." }] },
+      { c: 1, e: "neutral", t: "Every number has an address: row first, then column. A[2,3] is row 2, column 3, which is the number 6.", run: () => { clearHL(cur.m); highlightCell(cur.m, 1, 2); } },
+      { c: 1, e: "happy", t: "Remember: row first, column second. Always." }] },
     { t: "3. What can matrices do?", go: [
-      { c: 2, e: "neutral", t: "They store organized data: tables, scores, even images and networks in computer science." },
-      { c: 3, e: "excited", t: "And we can add, subtract and multiply them?" },
-      { c: 2, e: "happy", t: "Exactly. Let's learn those three operations." }] }] },
+      { c: 1, e: "neutral", t: "Matrices store organized data such as tables, scores, images and networks in computer science." },
+      { c: 1, e: "happy", t: "We can add, subtract and multiply them. Let's look at each operation." }] }] },
   { run: () => showMenu() }
 ];
 
 const LESSONS = {
   add: [
-    { c: 3, e: "thinking", t: "Let's start with addition. Is it just like normal addition?" },
-    { c: 2, e: "neutral", t: "Pretty much. We add corresponding elements.", run: () => opBoard("+", ADD_A, ADD_B, addMatrices) },
+    { c: 2, e: "neutral", t: "Good day! I will discuss Matrix Addition. To add matrices, we add corresponding elements.", run: () => opBoard("+", ADD_A, ADD_B, addMatrices) },
     { c: 2, e: "neutral", t: "Two matrices can be added only when they have the same dimensions. Here, both are 6×6." },
-    { c: 4, e: "neutral", t: "Click any number in A, B or the result to see its calculation.", run: () => cur.show(0, 0) },
-    { c: 3, e: "happy", t: "A[1,1] = 1 and B[1,1] = 36, so 1 + 36 = 37!" },
+    { c: 2, e: "thinking", t: "Take A[1,1] = 1. The element in the same position of B is B[1,1] = 36, so 1 + 36 = 37. Click any number to see its calculation.", run: () => cur.show(0, 0) },
     { c: 2, e: "happy", t: "Here is the full result, A + B. Every position adds up to 37.", run: revealAll },
-    { c: 2, e: "neutral", t: "Each element is added to the element in the same position." },
-    { c: 2, e: "thinking", t: "Your turn: what is A[3,4] + B[3,4]?", ch: [
+    { c: 2, e: "neutral", t: "In short: each element is added to the element in the same position." },
+    { c: 2, e: "thinking", t: "Quick check: what is A[3,4] + B[3,4]?", ch: [
       { t: "16 + 21 = 37", ok: true, fb: "Correct! 16 + 21 = 37." },
       { t: "15 + 22 = 37", ok: false, fb: WRONG },
       { t: "16 + 22 = 38", ok: false, fb: WRONG }] },
     { run: () => finish("add") }],
   sub: [
-    { c: 1, e: "neutral", t: "Subtraction should work almost the same way, right?" },
-    { c: 2, e: "neutral", t: "Exactly. We subtract corresponding elements.", run: () => opBoard("-", SUB_A, SUB_B, subtractMatrices) },
-    { c: 2, e: "neutral", t: "Two matrices can be subtracted only when they have the same dimensions." },
-    { c: 1, e: "happy", t: "So the first cell is 10 - 1 = 9.", run: () => cur.show(0, 0) },
-    { c: 4, e: "neutral", t: "Click other cells to check the rest.", run: revealAll },
-    { c: 2, e: "thinking", t: "Now you: what is A[4,5] - B[4,5]?", ch: [
+    { c: 3, e: "neutral", t: "Hello, everyone! My topic is Matrix Subtraction. We subtract corresponding elements.", run: () => opBoard("-", SUB_A, SUB_B, subtractMatrices) },
+    { c: 3, e: "neutral", t: "Two matrices can be subtracted only when they have the same dimensions. Both of these are 6×6." },
+    { c: 3, e: "happy", t: "For the first cell, A[1,1] - B[1,1] = 10 - 1 = 9. Click any number to check the others.", run: () => cur.show(0, 0) },
+    { c: 3, e: "happy", t: "Here is the complete result, A - B.", run: revealAll },
+    { c: 3, e: "thinking", t: "Quick check: what is A[4,5] - B[4,5]?", ch: [
       { t: "53 - 5 = 48", ok: true, fb: "Correct! 53 - 5 = 48." },
       { t: "53 - 6 = 47", ok: false, fb: "Not quite. Remember to subtract the corresponding elements." },
       { t: "54 - 5 = 49", ok: false, fb: "Not quite. Remember to subtract the corresponding elements." }] },
     { run: () => finish("sub") }],
   mul: [
-    { c: 1, e: "happy", t: "Addition and subtraction were easy enough." },
-    { c: 3, e: "happy", t: "How difficult can multiplication be?" },
-    { c: 2, e: "thinking", t: "...This is where you need to pay attention." },
-    { c: 2, e: "neutral", t: "For matrix multiplication, the number of columns in the first matrix must equal the number of rows in the second matrix.", run: mulBoard },
-    { c: 1, e: "surprised", t: "Wait... so it's not just multiplying the matching numbers?" },
-    { c: 2, e: "neutral", t: "Correct. It is NOT element-by-element. It is Row × Column, then we add the products." },
-    { c: 2, e: "thinking", t: "C[1,1] = (1×9) + (2×6) + (3×3) = 9 + 12 + 9 = 30.", run: () => cur.show(0, 0) },
-    { c: 3, e: "worried", t: "Okay... and C[1,2]?" },
-    { c: 2, e: "neutral", t: "C[1,2] = (1×8) + (2×5) + (3×2) = 8 + 10 + 6 = 24.", run: () => cur.show(0, 1) },
-    { c: 4, e: "happy", t: "Doing that for every cell gives the whole product.", run: () => { revealAll(); } },
-    { c: 2, e: "happy", t: "A × B = [30 24 18; 84 69 54; 138 114 90]. Click any cell to replay its calculation — try C[2,1]." },
-    { c: 2, e: "thinking", t: "Your turn: what is C[2,1]?", ch: [
+    { c: 1, e: "neutral", t: "Now we move on to Matrix Multiplication. This one needs closer attention." },
+    { c: 1, e: "neutral", t: "The number of columns in the first matrix must equal the number of rows in the second matrix.", run: mulBoard },
+    { c: 1, e: "thinking", t: "Matrix multiplication is NOT element-by-element. We multiply a row by a column, then add the products." },
+    { c: 1, e: "neutral", t: "For C[1,1]: (1×9) + (2×6) + (3×3) = 9 + 12 + 9 = 30.", run: () => cur.show(0, 0) },
+    { c: 1, e: "neutral", t: "For C[1,2]: (1×8) + (2×5) + (3×2) = 8 + 10 + 6 = 24.", run: () => cur.show(0, 1) },
+    { c: 4, e: "neutral", t: "Repeating this for every cell gives the full result.", run: revealAll },
+    { c: 4, e: "happy", t: "A × B = [30 24 18; 84 69 54; 138 114 90]. Click any cell to replay its calculation, for example C[2,1]." },
+    { c: 4, e: "thinking", t: "Quick check: what is C[2,1]?", ch: [
       { t: "(4×9) + (5×6) + (6×3) = 84", ok: true, fb: "Correct! 36 + 30 + 18 = 84." },
       { t: "4×9 = 36", ok: false, fb: "Not quite. Add ALL the row × column products." },
       { t: "(4+5+6) × (9+6+3) = 270", ok: false, fb: "Not quite. Multiply pairs first, then add." }] },
-    { c: 2, e: "neutral", t: "Before multiplying, always check the dimensions. The inner dimensions must match.", run: () => dimBoard(1) },
-    { c: 2, e: "neutral", t: "(2×3)(3×4): the inner 3 and 3 match, so we can multiply. The outside numbers give the result: 2×4." },
-    { c: 4, e: "neutral", t: "And when they don't match?", run: () => dimBoard(2) },
-    { c: 2, e: "neutral", t: "(2×3)(2×4): the inner dimensions do not match, so these matrices cannot be multiplied." },
+    { c: 4, e: "neutral", t: "Before multiplying, always check the dimensions. The inner dimensions must match.", run: () => dimBoard(1) },
+    { c: 4, e: "neutral", t: "For (2×3)(3×4), the inner 3 and 3 match, so we can multiply. The outside numbers give the result size: 2×4." },
+    { c: 4, e: "thinking", t: "Now (2×3)(2×4): the inner dimensions, 3 and 2, do not match, so these matrices cannot be multiplied.", run: () => dimBoard(2) },
     { run: () => finish("mul") }],
   basics: [
-    { c: 2, e: "neutral", t: "Quick review of the basics. A matrix has rows (horizontal) and columns (vertical).", run: basicsBoard },
+    { c: 4, e: "neutral", t: "A quick review. A matrix has rows (horizontal) and columns (vertical).", run: basicsBoard },
     { c: 4, e: "neutral", t: "Here are the three operations in one place.", run: reviewBoard },
-    { c: 3, e: "happy", t: "Same size for + and −. Inner sizes match for ×. Got it!" },
+    { c: 4, e: "happy", t: "Same size for addition and subtraction. Inner sizes must match for multiplication." },
     { run: () => finish("basics") }]
 };
 
 const ENDING = [
-  { c: 3, e: "happy", t: "So matrices aren't just random numbers in boxes." },
-  { c: 2, e: "happy", t: "Right. They are organized structures with specific rules." },
-  { c: 1, e: "excited", t: "Addition, subtraction, and multiplication!" },
-  { c: 4, e: "happy", t: "And now you know how they work.", run: showFinal },
+  { c: 2, e: "happy", t: "Addition: add corresponding elements. Both matrices need the same dimensions." },
+  { c: 3, e: "happy", t: "Subtraction: subtract corresponding elements. Same dimensions are required too." },
+  { c: 1, e: "excited", t: "Multiplication: multiply rows by columns. Columns of the first must equal rows of the second." },
+  { c: 4, e: "happy", t: "Matrices are organized structures with clear rules. Thank you for listening!", run: showFinal },
 ];
 
 /* ===== 7. FINAL SCREEN (shown after all lessons are completed) ===== */
