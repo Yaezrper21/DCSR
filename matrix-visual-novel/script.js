@@ -1,12 +1,12 @@
 /* MATRIX — A Discrete Structures Visual Novel. Vanilla JS, no libraries. */
 
 /* ===== 1. SETTINGS (edit names / image paths here) ===== */
-const PRESENTERS = "Rupinta Cruz Vicencio Pascua";
+const PRESENTERS = "[NAME 1] [NAME 2] [NAME 3] [NAME 4]";
 const CHARS = {
-  1: { name: "Rupinta", color: "#4ade80" },
-  2: { name: "Cruz", color: "#a78bfa" },
-  3: { name: "Vicencio", color: "#7dd3fc" },
-  4: { name: "Pascua", color: "#fb7185" }
+  1: { name: "Character 1", color: "#4ade80" },
+  2: { name: "Character 2", color: "#a78bfa" },
+  3: { name: "Character 3", color: "#7dd3fc" },
+  4: { name: "Character 4", color: "#fb7185" }
 };
 const portrait = (c, e) => `assets/character${c}/${e}.png`; // change image paths here
 
@@ -266,39 +266,10 @@ const ENDING = [
   { c: 4, e: "happy", t: "And now you know how they work.", run: showFinal },
 ];
 
-/* ===== 7. QUIZ ===== */
-const QUIZ = [
-  { q: "Which operations require matrices to have the same dimensions?", o: ["Addition only", "Subtraction only", "Addition and subtraction", "Multiplication only"], a: 2, why: "Both work element by element." },
-  { q: "What is the order of this matrix?", m: [[[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]], "M"], o: ["3×4", "4×3", "3×3", "4×4"], a: 1, why: "4 rows × 3 columns." },
-  { q: "For (2×3)(3×4), what is the resulting size?", o: ["2×4", "3×3", "4×2", "Cannot be multiplied"], a: 0, why: "Outside numbers: 2×4." },
-  { q: "Using A and B below, what is C[1,1] in A × B?", m: [MUL_A, "A", MUL_B, "B"], o: ["18", "24", "30", "36"], a: 2, why: "(1×9)+(2×6)+(3×3) = 30." }
-];
-let qi = 0, score = 0;
-function startQuiz() { qi = 0; score = 0; showQuestion(); }
-function showQuestion() {
-  const Q = QUIZ[qi]; let first = true;
-  $("#scoreTag").textContent = `SCORE: ${score} / ${QUIZ.length}`; $("#lessonName").textContent = "FINAL CHALLENGE";
-  board.className = ""; const box = el("div", "q");
-  box.append(el("h3", "", `QUESTION ${qi + 1} / ${QUIZ.length}<br>${Q.q}`));
-  if (Q.m) { const r = el("div", "mrow"); for (let i = 0; i < Q.m.length; i += 2) r.append(createMatrix(Q.m[i], Q.m[i + 1])); box.append(r); }
-  const opts = el("div", "opts"), nxt = el("button", "", qi < QUIZ.length - 1 ? "NEXT QUESTION ▶" : "FINISH ▶"); nxt.hidden = true;
-  Q.o.forEach((t, i) => {
-    const b = el("button", "", `${"ABCD"[i]}. ${t}`);
-    b.onclick = () => {
-      if (i === Q.a) {
-        if (first) score++; b.className = "good"; b.innerHTML = `✓ CORRECT — ${"ABCD"[i]}. ${t}`;
-        opts.querySelectorAll("button").forEach(x => x.disabled = true); nxt.hidden = false;
-        $("#scoreTag").textContent = `SCORE: ${score} / ${QUIZ.length}`; say(1, "excited", `Correct! ${Q.why}`);
-      } else { first = false; b.className = "bad"; b.innerHTML = `✕ TRY AGAIN — ${"ABCD"[i]}. ${t}`; b.disabled = true; say(4, "worried", "Not quite. Think again — you can retry."); }
-    };
-    opts.append(b);
-  });
-  nxt.onclick = () => { if (++qi < QUIZ.length) showQuestion(); else play(ENDING); };
-  box.append(opts, nxt); board.replaceChildren(box); say(2, "neutral", "Read carefully, then choose your answer.");
-}
+/* ===== 7. FINAL SCREEN (shown after all lessons are completed) ===== */
 function showFinal() {
-  $("#scoreTag").textContent = `SCORE: ${score} / ${QUIZ.length}`; board.className = "";
-  const f = el("div", "final", `<h1>MATRIX</h1><p>Organized numbers.<br>Clear rules.<br>Multiple operations.</p><br><p><b>Congratulations! You completed the Matrix lesson.</b></p><p>SCORE: ${score} / ${QUIZ.length}</p><br>`);
+  board.className = "";
+  const f = el("div", "final", `<h1>MATRIX</h1><p>Organized numbers.<br>Clear rules.<br>Multiple operations.</p><br><p><b>Congratulations! You completed the Matrix lesson.</b></p><br>`);
   const bar = el("div", "bar");
   [["REVIEW", () => startLesson("basics")], ["MAIN MENU", showMenu], ["RESTART", restart]].forEach(([t, fn]) => { const b = el("button", "", t); b.onclick = fn; bar.append(b); });
   f.append(bar); board.replaceChildren(f);
@@ -306,7 +277,7 @@ function showFinal() {
 
 /* ===== 8. SCENE NAVIGATION ===== */
 const done = new Set(); let screenId = "title";
-const LABELS = { add: "1. Matrix Addition", sub: "2. Matrix Subtraction", mul: "3. Matrix Multiplication", basics: "4. Review the Basics"};
+const LABELS = { add: "1. Matrix Addition", sub: "2. Matrix Subtraction", mul: "3. Matrix Multiplication", basics: "4. Review the Basics" };
 function screen(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id));
   screenId = id; if (document.activeElement) document.activeElement.blur();
@@ -321,12 +292,16 @@ function showMenu() {
 }
 function startLesson(k) {
   screen("game"); $("#lessonName").textContent = LABELS[k].replace(/^\d\. /, "").toUpperCase(); $("#scoreTag").textContent = "";
-  if (k === "quiz") { play([{ c: 3, e: "excited", t: "Final challenge time! Four questions — good luck!", run: () => { board.innerHTML = ""; } }, { run: startQuiz }]); }
-  else play(LESSONS[k]);
+  play(LESSONS[k]);
 }
-function finish(k) { done.add(k); showMenu(); }
+let endingShown = false;
+function finish(k) {
+  done.add(k);
+  if (!endingShown && Object.keys(LESSONS).every(x => done.has(x))) { endingShown = true; play(ENDING); }
+  else showMenu();
+}
 function startGame() { screen("game"); $("#lessonName").textContent = "INTRODUCTION"; $("#scoreTag").textContent = ""; play(INTRO); }
-function restart() { done.clear(); score = 0; screen("title"); }
+function restart() { done.clear(); endingShown = false; screen("title"); }
 
 function overlay(html) { $("#oBody").innerHTML = html; $("#overlay").hidden = false; $("#oClose").focus(); }
 const closeOverlay = () => { $("#overlay").hidden = true; };
