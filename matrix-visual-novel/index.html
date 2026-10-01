@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MATRIX — A Discrete Structures Visual Novel</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<canvas id="bg"></canvas>
+<main id="app">
+  <!-- TITLE -->
+  <section id="title" class="screen on"><div class="hero">
+    <div class="side" id="sideL"></div>
+    <div class="tbox"><h1>MATRIX</h1><h2>A Discrete Structures Visual Novel</h2><p class="tag">"Learn. Calculate. Solve."</p>
+      <button id="bStart">START</button><button id="bHow">HOW TO PLAY</button><button id="bCred">CREDITS</button></div>
+    <div class="side" id="sideR"></div></div></section>
+  <!-- LESSON MENU -->
+  <section id="menu" class="screen"><h2>WHAT DO YOU WANT TO LEARN?</h2><div id="menuList"></div></section>
+  <!-- GAME -->
+  <section id="game" class="screen">
+    <header><button id="bMenu">☰ MENU (Esc)</button><span id="lessonName"></span><span id="scoreTag"></span><button id="bPres">PRESENTATION (P)</button></header>
+    <div id="board"></div><div id="cast"></div>
+    <div id="dlg"><div id="who"></div><p id="txt"></p><div id="choices"></div><span id="next">▶</span></div>
+  </section>
+</main>
+<div id="overlay" hidden><div class="modal"><div id="oBody"></div><button id="oClose">CLOSE (Esc)</button></div></div>
+<script src="script.js"></script>
+</body></html>
