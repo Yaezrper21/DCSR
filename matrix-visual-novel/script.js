@@ -306,7 +306,7 @@ function showFinal() {
 
 /* ===== 8. SCENE NAVIGATION ===== */
 const done = new Set(); let screenId = "title";
-const LABELS = { add: "1. Matrix Addition", sub: "2. Matrix Subtraction", mul: "3. Matrix Multiplication", basics: "4. Review the Basics", quiz: "5. Final Challenge" };
+const LABELS = { add: "1. Matrix Addition", sub: "2. Matrix Subtraction", mul: "3. Matrix Multiplication", basics: "4. Review the Basics"};
 function screen(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id));
   screenId = id; if (document.activeElement) document.activeElement.blur();
