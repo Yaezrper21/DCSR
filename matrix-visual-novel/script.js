@@ -1,12 +1,12 @@
 /* MATRIX — A Discrete Structures Visual Novel. Vanilla JS, no libraries. */
 
 /* ===== 1. SETTINGS (edit names / image paths here) ===== */
-const PRESENTERS = "[NAME 1] [NAME 2] [NAME 3] [NAME 4]";
+const PRESENTERS = "Rupinta Cruz Vicencio Pascua";
 const CHARS = {
-  1: { name: "Character 1", color: "#4ade80" },
-  2: { name: "Character 2", color: "#a78bfa" },
-  3: { name: "Character 3", color: "#7dd3fc" },
-  4: { name: "Character 4", color: "#fb7185" }
+  1: { name: "Rupinta", color: "#4ade80" },
+  2: { name: "Cruz", color: "#a78bfa" },
+  3: { name: "Vicencio", color: "#7dd3fc" },
+  4: { name: "Pascua", color: "#fb7185" }
 };
 const portrait = (c, e) => `assets/character${c}/${e}.png`; // change image paths here
 
