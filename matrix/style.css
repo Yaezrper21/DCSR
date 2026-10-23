@@ -1,0 +1,63 @@
+/* ===== Classroom theme: school-life visual novel ===== */
+:root{--paper:#fffaf0;--ink:#3b2a1a;--wood:#a8743c;--chalkbg:rgba(24,52,46,.93);--chalk:#f4f1e6;--hl:#ffe14d;--row:#3b82f6;--col:#d946ef;--ok:#2f9e5a;--bad:#d64550}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;overflow:hidden;font-family:"Segoe UI",system-ui,sans-serif;color:var(--ink)}
+body{background:#8aa url(assets/classroom.jpg) center/cover no-repeat}  /* fills screen, keeps proportions */
+body::before{content:"";position:fixed;inset:0;background:linear-gradient(rgba(255,255,255,.08),rgba(20,30,60,.22));pointer-events:none}
+#app,.screen{position:absolute;inset:0}
+.screen{display:none;flex-direction:column;animation:fade .5s}.screen.on{display:flex}
+@keyframes fade{from{opacity:0}}
+button{font:inherit;cursor:pointer;color:#fff;background:#3f6fb5;border:2px solid #fff;border-radius:12px;padding:12px 24px;font-weight:700;letter-spacing:.04em;box-shadow:0 3px 0 #28497a;transition:.2s}
+button:hover:not(:disabled){background:#4f82cf;transform:translateY(-2px)}button:focus-visible{outline:3px solid var(--hl)}
+/* title + menu cards */
+.tbox{margin:5vh auto auto;padding:22px 40px;text-align:center;background:rgba(255,250,240,.93);border:4px solid var(--wood);border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+#menu .tbox{margin:auto;width:min(620px,92%)}.tbox button{margin:8px 6px}
+h1{font-size:clamp(56px,9vw,130px);letter-spacing:.1em;color:#2b4a8b;line-height:1}
+h2{font-weight:600;font-size:clamp(16px,1.8vw,26px);margin-bottom:6px}.tag{font-style:italic;margin-bottom:12px}
+#titleCast{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:3vw;pointer-events:none}#titleCast img{height:min(46vh,420px)}
+#menuList{display:grid;gap:10px;margin-top:14px}#menuList button{font-size:1.15rem;display:flex;justify-content:space-between}.chk{color:#b9f6c9}
+/* classroom screen */
+header{position:relative;z-index:5;display:flex;gap:12px;align-items:center;justify-content:space-between;padding:8px 14px}header button{padding:7px 14px;font-size:.85rem}
+#lessonName{padding:4px 14px;border-radius:999px;background:rgba(255,250,240,.9);font-weight:800;letter-spacing:.08em}#scoreTag{font-weight:800}
+#board{position:relative;z-index:2;flex:1;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:8px 14px;--cs:min(3.4vw,5.2vh);color:var(--chalk);visibility:hidden}
+#game.math #board{visibility:visible;margin:0 2vw;padding-bottom:6vh;background:var(--chalkbg);border:6px solid var(--wood);border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+#board.big{--cs:min(6vw,9vh)}
+.mrow{display:flex;align-items:center;gap:1.2vw;flex-wrap:wrap;justify-content:center}.op{font-size:calc(var(--cs)*1.1);opacity:.8}
+.matrix{text-align:center}.mlabel{font-weight:800;opacity:.85;margin-bottom:4px}
+.mgrid{display:grid;gap:3px;padding:6px 10px;border:3px solid var(--chalk);border-top:0;border-bottom:0;border-radius:16px}
+.cell{width:var(--cs);height:var(--cs);display:grid;place-items:center;font-weight:700;font-size:calc(var(--cs)*.4);background:rgba(255,255,255,.12);border-radius:8px;cursor:pointer;transition:.2s;font-variant-numeric:tabular-nums}
+.cell:hover{background:rgba(255,255,255,.25)}.cell.row{background:var(--row)}.cell.col{background:var(--col)}
+.cell.hl{background:var(--hl);color:#111;outline:3px solid #fff;transform:scale(1.12);animation:pop .5s}
+.cell.unk{color:transparent;position:relative}.cell.unk::after{content:"?";position:absolute;opacity:.7}
+@keyframes pop{50%{transform:scale(1.3)}}
+.info{min-height:3.2em;padding:10px 20px;border:2px dashed var(--chalk);border-radius:14px;font-size:clamp(16px,1.8vw,26px);text-align:center}.info b{color:var(--hl)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.bar button{padding:6px 14px}
+.cards{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}.card{width:min(300px,28vw);min-width:230px;padding:16px;border:2px solid var(--chalk);border-radius:14px}.card h3{color:var(--hl);margin-bottom:8px}.card p{margin:6px 0;font-size:clamp(15px,1.5vw,21px)}
+.dim{display:grid;gap:14px}.drow{padding:14px 22px;border:2px solid var(--chalk);border-radius:14px;font-size:clamp(18px,2.2vw,32px);text-align:center}
+.drow mark{background:var(--hl);color:#111;border-radius:6px;padding:0 8px}.drow small{display:block;font-size:.6em;margin-top:6px;opacity:.85}
+.final h1{color:var(--chalk);font-size:clamp(50px,8vw,110px)}.final p{font-size:clamp(16px,1.8vw,26px);text-align:center}
+/* characters: large in the classroom, small beside the dialogue while math is shown */
+#cast{position:absolute;inset:0;z-index:3;pointer-events:none}
+#cast figure{position:absolute;bottom:0;left:var(--x);transform:translateX(-50%);transition:left .4s,filter .3s;filter:brightness(.72)}
+#cast figure.hide{display:none}#cast figure.on{filter:drop-shadow(0 0 14px #fff)}
+#cast img{display:block;height:68vh;width:auto}
+#game.math #cast figure{left:calc(2vw + 9vh)}#game.math #cast img{height:27vh}
+/* dialogue box */
+#dlg{position:relative;z-index:4;margin:6px 2vw 1.5vh;padding:24px 28px 16px;min-height:20vh;background:#fffaf0;border:4px solid var(--wood);border-radius:18px;box-shadow:0 6px 20px rgba(0,0,0,.35);cursor:pointer}
+#game.math #dlg{margin-left:calc(18vh + 2vw)}
+#who{position:absolute;top:-18px;left:22px;padding:4px 20px;border-radius:999px;font-weight:800;color:#fff;border:2px solid #fff;text-shadow:0 1px 2px #0006}
+#txt{font-size:clamp(17px,1.7vw,26px);line-height:1.45;min-height:2.9em}
+#choices{display:grid;gap:8px;margin-top:8px}#choices button{text-align:left}
+#choices .good{background:var(--ok)}#choices .bad{background:var(--bad)}
+#next{position:absolute;right:20px;bottom:10px;color:var(--wood);animation:blink 1s infinite}@keyframes blink{50%{opacity:.2}}
+/* overlay */
+#overlay{position:fixed;inset:0;background:rgba(20,25,40,.7);display:grid;place-items:center;z-index:9}#overlay[hidden]{display:none}
+.modal{max-width:640px;width:90%;padding:30px;text-align:center;background:var(--paper);border:4px solid var(--wood);border-radius:20px;font-size:1.2rem;line-height:1.6}
+/* presentation mode: bigger, high contrast, no motion */
+body.pres{font-size:120%;--chalkbg:#0f2420}body.pres #board{--cs:min(4.2vw,6.4vh)}body.pres #board.big{--cs:min(7vw,10vh)}
+body.pres *{animation:none!important;transition:none!important}body.pres #cast figure:not(.on){display:none}
+body.pres #dlg{min-height:24vh;background:#fff}body.pres #txt{font-size:clamp(22px,2.2vw,34px)}body.pres #lessonName{display:none}
+@media(max-width:800px){#titleCast img:nth-child(2){display:none}}
+/* music toggle: top-right on title/menu, left of the Presentation button in the classroom */
+#bMusic{position:fixed;top:8px;right:14px;z-index:8;padding:7px 14px;font-size:.85rem}
+body[data-s=game] #bMusic{right:calc(14px + 15em)}
